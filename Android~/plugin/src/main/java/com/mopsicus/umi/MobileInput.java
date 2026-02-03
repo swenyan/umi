@@ -304,8 +304,13 @@ public class MobileInput {
             String keyboardLanguage = data.optString("keyboard_language");
             String returnKeyType = data.getString("return_key_type");
             String alignment = data.getString("align");
+            String fontStyle = data.optString("font_style", "Normal");
             String customFont = data.getString("font");
             boolean multiline = data.getBoolean("multiline");
+            int paddingLeft = (int) Math.round(data.optDouble("padding_left", 0));
+            int paddingTop = (int) Math.round(data.optDouble("padding_top", 0));
+            int paddingRight = (int) Math.round(data.optDouble("padding_right", 0));
+            int paddingBottom = (int) Math.round(data.optDouble("padding_bottom", 0));
             caretColor = Color.argb(caretColor_a, caretColor_r, caretColor_g, caretColor_b);
             isCaretChange = data.getBoolean("caret_color");
             edit = new EditText(Plugin.activity.getApplicationContext());
@@ -317,7 +322,7 @@ public class MobileInput {
             LayoutParams params = new LayoutParams(rect.width(), rect.height());
             params.setMargins(rect.left, rect.top, 0, 0);
             edit.setLayoutParams(params);
-            edit.setPadding(0, 0, 0, 0);
+            edit.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
             editInputType = 0;
             this.setContentType(contentType);
             if (contentType.equals("Custom")) {
@@ -424,15 +429,31 @@ public class MobileInput {
             edit.setBackgroundColor(Color.argb(backColor_a, backColor_r, backColor_g, backColor_b));
             edit.setHintTextColor(Color.argb(placeHolderColor_a, placeHolderColor_r, placeHolderColor_g, placeHolderColor_b));
             edit.setHighlightColor(Color.argb(highlightColor_a, highlightColor_r, highlightColor_g, highlightColor_b));
+
+            int tfStyle = Typeface.NORMAL;
+            switch (fontStyle) {
+                case "Bold":
+                    tfStyle = Typeface.BOLD;
+                    break;
+                case "Italic":
+                    tfStyle = Typeface.ITALIC;
+                    break;
+                case "BoldItalic":
+                    tfStyle = Typeface.BOLD_ITALIC;
+                    break;
+                default:
+                    tfStyle = Typeface.NORMAL;
+                    break;
+            }
             if (!customFont.equals("default")) {
                 try {
                     Typeface face = Typeface.createFromAsset(Plugin.activity.getAssets(), String.format("%s.ttf", customFont));
-                    edit.setTypeface(face);
+                    edit.setTypeface(face, tfStyle);
                 } catch (Exception e) {
-                    edit.setTypeface(Typeface.SANS_SERIF);
+                    edit.setTypeface(Typeface.SANS_SERIF, tfStyle);
                 }
             } else {
-                edit.setTypeface(Typeface.SANS_SERIF);
+                edit.setTypeface(Typeface.SANS_SERIF, tfStyle);
             }
             if (!keyboardLanguage.equals("default")) {
                 setKeyboardLanguage(keyboardLanguage);

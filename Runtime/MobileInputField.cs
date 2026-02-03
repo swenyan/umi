@@ -45,9 +45,14 @@ namespace UMI {
             public string KeyboardType;
             public float FontSize;
             public string Align;
+            public string FontStyle;
             public string Placeholder;
             public Color PlaceholderColor;
             public int CharacterLimit;
+            public float PaddingLeft;
+            public float PaddingTop;
+            public float PaddingRight;
+            public float PaddingBottom;
         }
 
         /// <summary>
@@ -451,12 +456,120 @@ namespace UMI {
             var ratio = rect.height / _inputObjectText.rectTransform.rect.height;
             _config.FontSize = ((float)_inputObjectText.fontSize) * ratio;
             _config.TextColor = _inputObjectText.color;
-            _config.Align = _inputObjectText.alignment.ToString();
+            _config.Align = GetNativeAlign(_inputObjectText.alignment);
+            _config.FontStyle = GetNativeFontStyle(_inputObjectText.fontStyle);
             _config.ContentType = _inputObject.contentType.ToString();
             _config.BackgroundColor = BackgroundColor;
             _config.Multiline = _inputObject.lineType != TMP_InputField.LineType.SingleLine;
             _config.KeyboardType = _inputObject.keyboardType.ToString();
             _config.InputType = _inputObject.inputType.ToString();
+
+            // TMP uses margins inside its text area; apply them as native paddings (in screen pixels).
+            // TMP margin order: left, top, right, bottom.
+            var margin = _inputObjectText.margin;
+            _config.PaddingLeft = margin.x * ratio;
+            _config.PaddingTop = margin.y * ratio;
+            _config.PaddingRight = margin.z * ratio;
+            _config.PaddingBottom = margin.w * ratio;
+        }
+
+        static string GetNativeFontStyle(FontStyles style) {
+            var bold = (style & FontStyles.Bold) != 0;
+            var italic = (style & FontStyles.Italic) != 0;
+            if (bold && italic) {
+                return "BoldItalic";
+            }
+            if (bold) {
+                return "Bold";
+            }
+            if (italic) {
+                return "Italic";
+            }
+            return "Normal";
+        }
+
+        static string GetNativeAlign(TextAlignmentOptions alignment) {
+            // Native implementations currently support only 9-point alignment:
+            // TopLeft/Top/TopRight, Left/Center/Right, BottomLeft/Bottom/BottomRight.
+            // Map all TMP variants to the closest supported option.
+            switch (alignment) {
+                case TextAlignmentOptions.TopLeft:
+                case TextAlignmentOptions.TopFlush:
+                case TextAlignmentOptions.TopJustified:
+                case TextAlignmentOptions.TopGeoAligned:
+                case TextAlignmentOptions.CaplineLeft:
+                case TextAlignmentOptions.BaselineLeft:
+                case TextAlignmentOptions.MidlineLeft:
+                case TextAlignmentOptions.BottomLeft:
+                case TextAlignmentOptions.Left:
+                    // The above includes non-9-grid values; we handle vertical/horizontal below.
+                    break;
+            }
+
+            // Horizontal
+            var isLeft =
+                alignment == TextAlignmentOptions.TopLeft ||
+                alignment == TextAlignmentOptions.Left ||
+                alignment == TextAlignmentOptions.BottomLeft ||
+                alignment == TextAlignmentOptions.BaselineLeft ||
+                alignment == TextAlignmentOptions.MidlineLeft ||
+                alignment == TextAlignmentOptions.CaplineLeft ||
+                alignment == TextAlignmentOptions.TopFlush ||
+                alignment == TextAlignmentOptions.TopJustified ||
+                alignment == TextAlignmentOptions.TopGeoAligned ||
+                alignment == TextAlignmentOptions.BaselineFlush ||
+                alignment == TextAlignmentOptions.BaselineJustified ||
+                alignment == TextAlignmentOptions.BaselineGeoAligned ||
+                alignment == TextAlignmentOptions.BottomFlush ||
+                alignment == TextAlignmentOptions.BottomJustified ||
+                alignment == TextAlignmentOptions.BottomGeoAligned ||
+                alignment == TextAlignmentOptions.Justified ||
+                alignment == TextAlignmentOptions.Flush ||
+                alignment == TextAlignmentOptions.Geometry;
+
+            var isRight =
+                alignment == TextAlignmentOptions.TopRight ||
+                alignment == TextAlignmentOptions.Right ||
+                alignment == TextAlignmentOptions.BottomRight ||
+                alignment == TextAlignmentOptions.BaselineRight ||
+                alignment == TextAlignmentOptions.MidlineRight ||
+                alignment == TextAlignmentOptions.CaplineRight;
+
+            // Vertical
+            var isTop =
+                alignment == TextAlignmentOptions.TopLeft ||
+                alignment == TextAlignmentOptions.Top ||
+                alignment == TextAlignmentOptions.TopRight ||
+                alignment == TextAlignmentOptions.TopFlush ||
+                alignment == TextAlignmentOptions.TopJustified ||
+                alignment == TextAlignmentOptions.TopGeoAligned ||
+                alignment == TextAlignmentOptions.CaplineLeft ||
+                alignment == TextAlignmentOptions.Capline ||
+                alignment == TextAlignmentOptions.CaplineRight;
+
+            var isBottom =
+                alignment == TextAlignmentOptions.BottomLeft ||
+                alignment == TextAlignmentOptions.Bottom ||
+                alignment == TextAlignmentOptions.BottomRight ||
+                alignment == TextAlignmentOptions.BottomFlush ||
+                alignment == TextAlignmentOptions.BottomJustified ||
+                alignment == TextAlignmentOptions.BottomGeoAligned;
+
+            // Midline/Baseline treated as center vertically.
+            var vertical = isTop ? "Top" : (isBottom ? "Bottom" : "");
+
+            var horizontal = isRight ? "Right" : (isLeft ? "Left" : "");
+            if (string.IsNullOrEmpty(horizontal)) {
+                horizontal = "Center";
+            }
+
+            if (vertical == "Top") {
+                return horizontal == "Left" ? "TopLeft" : (horizontal == "Right" ? "TopRight" : "Top");
+            }
+            if (vertical == "Bottom") {
+                return horizontal == "Left" ? "BottomLeft" : (horizontal == "Right" ? "BottomRight" : "Bottom");
+            }
+            return horizontal == "Left" ? "Left" : (horizontal == "Right" ? "Right" : "Center");
         }
 
         /// <summary>
@@ -591,6 +704,7 @@ namespace UMI {
             data["font_size"] = InvariantCultureString(_config.FontSize);
             data["content_type"] = _config.ContentType;
             data["align"] = _config.Align;
+            data["font_style"] = _config.FontStyle;
             data["with_done_button"] = IsWithDoneButton;
             data["with_clear_button"] = IsWithClearButton;
             data["font"] = CustomFont;
@@ -612,6 +726,10 @@ namespace UMI {
             data["input_type"] = _config.InputType;
             data["keyboard_type"] = _config.KeyboardType;
             data["keyboard_language"] = KeyboardLanguage;
+            data["padding_left"] = InvariantCultureString(_config.PaddingLeft);
+            data["padding_top"] = InvariantCultureString(_config.PaddingTop);
+            data["padding_right"] = InvariantCultureString(_config.PaddingRight);
+            data["padding_bottom"] = InvariantCultureString(_config.PaddingBottom);
             data["return_key_type"] = ReturnKey switch {
                 ReturnKeyType.Next => (JsonNode)"Next",
                 ReturnKeyType.Done => (JsonNode)"Done",

@@ -1,0 +1,12 @@
+Library\PackageCache\com.mopsicus.umi@0013a89b4c\Runtime\MobileInputField.cs(491,38): error CS0246: The type or namespace name 'TMP_TextAlignmentOptions' could not be found (are you missing a using directive or an assembly reference?)
+// TMP_TextAlignmentOptions should just be TextAlignmentOptions.
+
+Failed to find entry-points:
+Mono.Cecil.AssemblyResolutionException: Failed to resolve assembly: 'UMI.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null'
+  at Mono.Cecil.BaseAssemblyResolver.Resolve (Mono.Cecil.AssemblyNameReference name, Mono.Cecil.ReaderParameters parameters) [0x00105] in <ebb9e4250ed24cbfa42055e3532ef311>:0 
+  at zzzUnity.Burst.CodeGen.AssemblyResolver.Resolve (Mono.Cecil.AssemblyNameReference name) [0x00039] in <a2dd15248a25411e914af2a2c82fb63f>:0 
+  at Burst.Compiler.IL.AssemblyLoader.Resolve (Mono.Cecil.AssemblyNameReference name) [0x00079] in <a2dd15248a25411e914af2a2c82fb63f>:0 
+  at Burst.Compiler.IL.Server.EntryPointMethodFinder.FindEntryPoints (System.String[] rootAssemblyNames, Burst.Compiler.IL.Hashing.CacheRuntime.HashCacheAssemblyStore assemblyStore, Burst.Compiler.IL.AssemblyLoader assemblyLoader, Burst.Compiler.IL.NativeCompilerOptions options, Burst.Compiler.IL.Server.ProfileDelegate profileCallback, System.Boolean includeRootAssemblyReferences, System.Boolean splitTargets, Burst.Compiler.IL.Helpers.DebugLogWriter debugWriter) [0x00055] in <a2dd15248a25411e914af2a2c82fb63f>:0 
+  at Burst.Compiler.IL.Server.FindMethodsJob.Execute (Burst.Compiler.IL.Server.CompilerServerJobExecutionContext context) [0x00133] in <a2dd15248a25411e914af2a2c82fb63f>:0 
+
+While compiling job:
