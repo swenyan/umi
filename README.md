@@ -163,6 +163,17 @@ The iOS plugin is simple, with only 3 files. If you want to know how it works un
 
 Android plugin is a compiled AAR library. All sources are available in [Android~](./Android~/) folder. You can edit the android part and recompile the library to suit your needs.
 
+#### Troubleshooting (Android Studio / Gradle export)
+
+If your exported project fails with something like:
+
+- `:launcher:checkReleaseDuplicateClasses`
+- `Duplicate class bitter.jnibridge.JNIBridge found in ... classes.jar and ... unity-classes.jar`
+
+it means a **Unity Player `classes.jar`** (or another plugin jar containing Unity classes) is being packaged into the app **in addition to** Unity’s own `unity-classes.jar`.
+
+Fix: remove the extra `classes.jar` from your project (commonly `Assets/Plugins/Android/classes.jar` in Unity, or `launcher/libs/classes.jar` in the exported Gradle project). UMI should be included as `Plugins/Android/MobileInput.aar` only.
+
 Make sure your `AndroidManifest.xml` has the following setting:
 
 ```xml

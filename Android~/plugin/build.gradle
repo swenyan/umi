@@ -38,7 +38,10 @@ android {
 }
 
 dependencies {
-    compileOnly fileTree(dir: 'libs', includes: ['*.jar'])
+    // Unity player classes are needed only for compilation (UnityPlayer.UnitySendMessage, etc).
+    // Keep them in a "~" folder so Unity won't accidentally import/export them as an Android plugin,
+    // which can cause duplicate class errors (e.g. bitter.jnibridge.JNIBridge vs unity-classes.jar).
+    compileOnly fileTree(dir: 'libs~', includes: ['*.jar'])
     implementation libs.appcompat.v7
     androidTestImplementation libs.runner
     androidTestImplementation libs.espresso.core

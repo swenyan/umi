@@ -162,6 +162,17 @@ iOS часть плагина достаточна проста, содержи�
 
 Android часть – это скомпилированная AAR библиотека. Все исходные коды доступны в папке [Android~](./Android~/). Вы можете изменить эту часть как вам необходимо и перекомпилировать.
 
+#### Troubleshooting (экспорт в Android Studio / Gradle)
+
+Если при сборке экспортированного проекта появляется ошибка вида:
+
+- `:launcher:checkReleaseDuplicateClasses`
+- `Duplicate class bitter.jnibridge.JNIBridge found in ... classes.jar and ... unity-classes.jar`
+
+это означает, что в сборку попал **Unity Player `classes.jar`** (или другой jar с Unity-классами) **в дополнение** к `unity-classes.jar`, который Unity добавляет сам.
+
+Решение: удалите лишний `classes.jar` из проекта (чаще всего это `Assets/Plugins/Android/classes.jar` в Unity или `launcher/libs/classes.jar` в экспортированном Gradle-проекте). Для UMI достаточно `Plugins/Android/MobileInput.aar`.
+
 Убедитесь что ваш `AndroidManifest.xml` содержит следующую настройку:
 
 ```xml
