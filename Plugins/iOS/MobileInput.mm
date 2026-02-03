@@ -40,6 +40,11 @@ NSMutableDictionary *mobileInputList = nil;
 @property (nonatomic, strong) NSString *languageCode;
 @end
 
+/// UITextField with configurable text insets (padding)
+@interface PaddedTextField : CustomTextField
+@property(nonatomic, assign) UIEdgeInsets textInsets;
+@end
+
 /// Interface for placeholder
 @interface PlaceholderTextView : UITextView
 
@@ -145,6 +150,23 @@ NSMutableDictionary *mobileInputList = nil;
         }
     }
     return [super textInputMode];
+}
+
+@end
+
+/// PaddedTextField implementation
+@implementation PaddedTextField
+
+- (CGRect)textRectForBounds:(CGRect)bounds {
+    return UIEdgeInsetsInsetRect(bounds, self.textInsets);
+}
+
+- (CGRect)editingRectForBounds:(CGRect)bounds {
+    return UIEdgeInsetsInsetRect(bounds, self.textInsets);
+}
+
+- (CGRect)placeholderRectForBounds:(CGRect)bounds {
+    return UIEdgeInsetsInsetRect(bounds, self.textInsets);
 }
 
 @end
@@ -603,6 +625,7 @@ NSMutableDictionary *mobileInputList = nil;
     UIColor *caretColor = [UIColor colorWithRed:caretColor_r green:caretColor_g blue:caretColor_b alpha:caretColor_a];
     NSString *contentType = [data valueForKey:@"content_type"];
     NSString *alignment = [data valueForKey:@"align"];
+    NSString *fontStyle = [data valueForKey:@"font_style"];
     NSString *customFont = [data valueForKey:@"font"];
     BOOL withDoneButton = [[data valueForKey:@"with_done_button"] boolValue];
     BOOL withClearButton = [[data valueForKey:@"with_clear_button"] boolValue];
@@ -734,6 +757,31 @@ NSMutableDictionary *mobileInputList = nil;
         CGFontRelease(newFont);
         uiFont = [UIFont fontWithName:font size:fontSize];
     }
+
+    // Apply font style (best-effort). Not all custom fonts have bold/italic variants.
+    if (fontStyle != nil && ![fontStyle isEqualToString:@"Normal"]) {
+        UIFontDescriptorSymbolicTraits traits = 0;
+        if ([fontStyle isEqualToString:@"Bold"]) {
+            traits = UIFontDescriptorTraitBold;
+        } else if ([fontStyle isEqualToString:@"Italic"]) {
+            traits = UIFontDescriptorTraitItalic;
+        } else if ([fontStyle isEqualToString:@"BoldItalic"]) {
+            traits = (UIFontDescriptorTraitBold | UIFontDescriptorTraitItalic);
+        }
+        UIFontDescriptor *desc = [uiFont.fontDescriptor fontDescriptorWithSymbolicTraits:traits];
+        if (desc != nil) {
+            UIFont *styled = [UIFont fontWithDescriptor:desc size:fontSize];
+            if (styled != nil) {
+                uiFont = styled;
+            }
+        }
+    }
+
+    // Padding (TMP margins) are passed in screen pixels; convert to points.
+    float paddingLeft = [[data valueForKey:@"padding_left"] floatValue] / [UIScreen mainScreen].scale;
+    float paddingTop = [[data valueForKey:@"padding_top"] floatValue] / [UIScreen mainScreen].scale;
+    float paddingRight = [[data valueForKey:@"padding_right"] floatValue] / [UIScreen mainScreen].scale;
+    float paddingBottom = [[data valueForKey:@"padding_bottom"] floatValue] / [UIScreen mainScreen].scale;
     if (isMultiline) {
         PlaceholderTextView *textView = [[PlaceholderTextView alloc] initWithFrame:CGRectMake(x, y, width, height)];
         textView.keyboardType = keyType;
@@ -747,7 +795,8 @@ NSMutableDictionary *mobileInputList = nil;
         textView.returnKeyType = returnKeyType;
         textView.textAlignment = textAlign;
         textView.autocorrectionType = autoCorrection ? UITextAutocorrectionTypeYes : UITextAutocorrectionTypeNo;
-        textView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
+        textView.contentInset = UIEdgeInsetsZero;
+        textView.textContainerInset = UIEdgeInsetsMake(paddingTop, paddingLeft, paddingBottom, paddingRight);
         textView.placeholder = placeholder;
         textView.placeholderColor = placeHolderColor;
         if (isChangeCaret) {
@@ -766,7 +815,7 @@ NSMutableDictionary *mobileInputList = nil;
         }
         editView = textView;
     } else {
-        CustomTextField *textField = [[CustomTextField alloc] initWithFrame:CGRectMake(x, y, width, height)];
+        PaddedTextField *textField = [[PaddedTextField alloc] initWithFrame:CGRectMake(x, y, width, height)];
         textField.keyboardType = keyType;
         [textField setFont:uiFont];
         textField.delegate = self;
@@ -785,6 +834,7 @@ NSMutableDictionary *mobileInputList = nil;
         textField.contentVerticalAlignment = valign;
         textField.contentHorizontalAlignment = halign;
         textField.textAlignment = textAlign;
+        textField.textInsets = UIEdgeInsetsMake(paddingTop, paddingLeft, paddingBottom, paddingRight);
         if (withClearButton) {
             textField.clearButtonMode = UITextFieldViewModeWhileEditing;
         }
