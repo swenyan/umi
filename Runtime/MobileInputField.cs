@@ -488,72 +488,72 @@ namespace UMI {
             return "Normal";
         }
 
-        static string GetNativeAlign(TMP_TextAlignmentOptions alignment) {
+        static string GetNativeAlign(TextAlignmentOptions alignment) {
             // Native implementations currently support only 9-point alignment:
             // TopLeft/Top/TopRight, Left/Center/Right, BottomLeft/Bottom/BottomRight.
             // Map all TMP variants to the closest supported option.
             switch (alignment) {
-                case TMP_TextAlignmentOptions.TopLeft:
-                case TMP_TextAlignmentOptions.TopFlush:
-                case TMP_TextAlignmentOptions.TopJustified:
-                case TMP_TextAlignmentOptions.TopGeoAligned:
-                case TMP_TextAlignmentOptions.CaplineLeft:
-                case TMP_TextAlignmentOptions.BaselineLeft:
-                case TMP_TextAlignmentOptions.MidlineLeft:
-                case TMP_TextAlignmentOptions.BottomLeft:
-                case TMP_TextAlignmentOptions.Left:
+                case TextAlignmentOptions.TopLeft:
+                case TextAlignmentOptions.TopFlush:
+                case TextAlignmentOptions.TopJustified:
+                case TextAlignmentOptions.TopGeoAligned:
+                case TextAlignmentOptions.CaplineLeft:
+                case TextAlignmentOptions.BaselineLeft:
+                case TextAlignmentOptions.MidlineLeft:
+                case TextAlignmentOptions.BottomLeft:
+                case TextAlignmentOptions.Left:
                     // The above includes non-9-grid values; we handle vertical/horizontal below.
                     break;
             }
 
             // Horizontal
             var isLeft =
-                alignment == TMP_TextAlignmentOptions.TopLeft ||
-                alignment == TMP_TextAlignmentOptions.Left ||
-                alignment == TMP_TextAlignmentOptions.BottomLeft ||
-                alignment == TMP_TextAlignmentOptions.BaselineLeft ||
-                alignment == TMP_TextAlignmentOptions.MidlineLeft ||
-                alignment == TMP_TextAlignmentOptions.CaplineLeft ||
-                alignment == TMP_TextAlignmentOptions.TopFlush ||
-                alignment == TMP_TextAlignmentOptions.TopJustified ||
-                alignment == TMP_TextAlignmentOptions.TopGeoAligned ||
-                alignment == TMP_TextAlignmentOptions.BaselineFlush ||
-                alignment == TMP_TextAlignmentOptions.BaselineJustified ||
-                alignment == TMP_TextAlignmentOptions.BaselineGeoAligned ||
-                alignment == TMP_TextAlignmentOptions.BottomFlush ||
-                alignment == TMP_TextAlignmentOptions.BottomJustified ||
-                alignment == TMP_TextAlignmentOptions.BottomGeoAligned ||
-                alignment == TMP_TextAlignmentOptions.Justified ||
-                alignment == TMP_TextAlignmentOptions.Flush ||
-                alignment == TMP_TextAlignmentOptions.Geometry;
+                alignment == TextAlignmentOptions.TopLeft ||
+                alignment == TextAlignmentOptions.Left ||
+                alignment == TextAlignmentOptions.BottomLeft ||
+                alignment == TextAlignmentOptions.BaselineLeft ||
+                alignment == TextAlignmentOptions.MidlineLeft ||
+                alignment == TextAlignmentOptions.CaplineLeft ||
+                alignment == TextAlignmentOptions.TopFlush ||
+                alignment == TextAlignmentOptions.TopJustified ||
+                alignment == TextAlignmentOptions.TopGeoAligned ||
+                alignment == TextAlignmentOptions.BaselineFlush ||
+                alignment == TextAlignmentOptions.BaselineJustified ||
+                alignment == TextAlignmentOptions.BaselineGeoAligned ||
+                alignment == TextAlignmentOptions.BottomFlush ||
+                alignment == TextAlignmentOptions.BottomJustified ||
+                alignment == TextAlignmentOptions.BottomGeoAligned ||
+                alignment == TextAlignmentOptions.Justified ||
+                alignment == TextAlignmentOptions.Flush ||
+                alignment == TextAlignmentOptions.Geometry;
 
             var isRight =
-                alignment == TMP_TextAlignmentOptions.TopRight ||
-                alignment == TMP_TextAlignmentOptions.Right ||
-                alignment == TMP_TextAlignmentOptions.BottomRight ||
-                alignment == TMP_TextAlignmentOptions.BaselineRight ||
-                alignment == TMP_TextAlignmentOptions.MidlineRight ||
-                alignment == TMP_TextAlignmentOptions.CaplineRight;
+                alignment == TextAlignmentOptions.TopRight ||
+                alignment == TextAlignmentOptions.Right ||
+                alignment == TextAlignmentOptions.BottomRight ||
+                alignment == TextAlignmentOptions.BaselineRight ||
+                alignment == TextAlignmentOptions.MidlineRight ||
+                alignment == TextAlignmentOptions.CaplineRight;
 
             // Vertical
             var isTop =
-                alignment == TMP_TextAlignmentOptions.TopLeft ||
-                alignment == TMP_TextAlignmentOptions.Top ||
-                alignment == TMP_TextAlignmentOptions.TopRight ||
-                alignment == TMP_TextAlignmentOptions.TopFlush ||
-                alignment == TMP_TextAlignmentOptions.TopJustified ||
-                alignment == TMP_TextAlignmentOptions.TopGeoAligned ||
-                alignment == TMP_TextAlignmentOptions.CaplineLeft ||
-                alignment == TMP_TextAlignmentOptions.Capline ||
-                alignment == TMP_TextAlignmentOptions.CaplineRight;
+                alignment == TextAlignmentOptions.TopLeft ||
+                alignment == TextAlignmentOptions.Top ||
+                alignment == TextAlignmentOptions.TopRight ||
+                alignment == TextAlignmentOptions.TopFlush ||
+                alignment == TextAlignmentOptions.TopJustified ||
+                alignment == TextAlignmentOptions.TopGeoAligned ||
+                alignment == TextAlignmentOptions.CaplineLeft ||
+                alignment == TextAlignmentOptions.Capline ||
+                alignment == TextAlignmentOptions.CaplineRight;
 
             var isBottom =
-                alignment == TMP_TextAlignmentOptions.BottomLeft ||
-                alignment == TMP_TextAlignmentOptions.Bottom ||
-                alignment == TMP_TextAlignmentOptions.BottomRight ||
-                alignment == TMP_TextAlignmentOptions.BottomFlush ||
-                alignment == TMP_TextAlignmentOptions.BottomJustified ||
-                alignment == TMP_TextAlignmentOptions.BottomGeoAligned;
+                alignment == TextAlignmentOptions.BottomLeft ||
+                alignment == TextAlignmentOptions.Bottom ||
+                alignment == TextAlignmentOptions.BottomRight ||
+                alignment == TextAlignmentOptions.BottomFlush ||
+                alignment == TextAlignmentOptions.BottomJustified ||
+                alignment == TextAlignmentOptions.BottomGeoAligned;
 
             // Midline/Baseline treated as center vertically.
             var vertical = isTop ? "Top" : (isBottom ? "Bottom" : "");
